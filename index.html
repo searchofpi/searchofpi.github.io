@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cowin availability</title>
+<audio>
+    <source src="sound.mp3"></source>
+    Your browser does not support audio
+</audio>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function(){
+
+        var query = window.location.href.slice(window.location.href.indexOf('?') + 1);
+        //query = query + "&date=" + getTodayDate();
+        //var query = "district_id=294&date=20-05-2021";
+        //var url = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByDistrict?" + query;
+    var url = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?" + query;
+
+        $.get(url, function(data){
+            if(data.centers.length == 0){
+                $("#result").html('No slots available for the given input');
+            }
+            else{
+                var result = [];
+
+                for(var i=0; i<data.centers.length; i++){
+                    var center = data.centers[i];
+                    var sessions = center.sessions;
+                    for(var j=0; j<sessions.length; j++){
+                        var ses = sessions[j];
+                        if(ses.available_capacity > 0 
+               && ses.min_age_limit == 18 
+               && ses.available_capacity_dose1 > 0
+               && ses.vaccine == 'COVAXIN'
+              ){
+                            ses.name = center.name;
+                            ses.pincode = center.pincode;
+
+                            result.push(ses);
+                        }
+                    }
+
+                }
+            var audio = document.getElementsByTagName("audio")[0];
+                if(result.length == 0)
+            {    
+                    $("#result").html('No slots available for 18+ for the given input');
+            }
+                else
+            {    
+                var display = "total slots available: " + result.length + "\n\n" + JSON.stringify(result, undefined, 2);
+                $("#result").html(display);
+
+                // For this to work on chrome, go to chrome://settings/content/sound
+                // and whitelist the site by adding it to "Allowed to play sound"
+                audio.play();
+            }           
+            }
+       });
+
+    });
+
+    function getTodayDate(){
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+
+        today = dd + '-' + mm + '-' + yyyy;
+        return today;
+    }
+
+</script>
+</head>
+<body>
+    <pre style="font-size: 22px" id="result"></pre>
+    <!--<meta http-equiv="refresh" content="10"> -->
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="-1" />
+</body>
+</html>
