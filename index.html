@@ -16,6 +16,7 @@
         //var query = "district_id=294&date=20-05-2021";
         //var url = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByDistrict?" + query;
     var url = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?" + query;
+        console.log(url);
 
         $.get(url, function(data){
             if(data.centers.length == 0){
